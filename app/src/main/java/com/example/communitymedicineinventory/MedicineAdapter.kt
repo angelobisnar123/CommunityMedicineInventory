@@ -1,9 +1,9 @@
 package com.example.communitymedicineinventory
 
 import android.graphics.Color
-import android.graphics.Typeface
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
@@ -12,48 +12,28 @@ class MedicineAdapter(
     private val onClick: (Medicine) -> Unit
 ) : RecyclerView.Adapter<MedicineAdapter.MedicineViewHolder>() {
 
-    class MedicineViewHolder(
-        val container: LinearLayout,
-        val nameText: TextView,
-        val summaryText: TextView,
-        val statusText: TextView
-    ) : RecyclerView.ViewHolder(container)
+    class MedicineViewHolder(itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
+
+        val nameText: TextView =
+            itemView.findViewById(R.id.medicineName)
+
+        val summaryText: TextView =
+            itemView.findViewById(R.id.medicineSummary)
+
+        val statusText: TextView =
+            itemView.findViewById(R.id.medicineStatus)
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): MedicineViewHolder {
-        val context = parent.context
 
-        val container = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(16, 16, 16, 16)
-            setBackgroundColor(Color.WHITE)
-        }
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_medicine, parent, false)
 
-        val name = TextView(context).apply {
-            textSize = 18f
-            setTextColor(Color.BLACK)
-            setTypeface(null, Typeface.BOLD)
-        }
-
-        val summary = TextView(context).apply {
-            textSize = 14f
-            setTextColor(Color.DKGRAY)
-        }
-
-        val status = TextView(context).apply {
-            textSize = 14f
-            setTextColor(Color.BLACK)
-        }
-
-        container.addView(name)
-        container.addView(summary)
-        container.addView(status)
-
-        return MedicineViewHolder(
-            container, name, summary, status
-        )
+        return MedicineViewHolder(view)
     }
 
     override fun onBindViewHolder(
@@ -63,25 +43,44 @@ class MedicineAdapter(
         val medicine = items[position]
 
         holder.nameText.text = medicine.name
+
         holder.summaryText.text =
             "${medicine.category} | Stock: ${medicine.quantity} ${medicine.unit}"
 
-        holder.statusText.text =
-            if (medicine.isLowStock()) {
+        if (medicine.isLowStock()) {
+            holder.statusText.text =
                 "LOW STOCK | Minimum: ${medicine.minimumStock}"
-            } else {
-                "Stock available"
-            }
 
-        holder.container.setOnClickListener {
+            holder.statusText.setTextColor(Color.RED)
+        } else {
+            holder.statusText.text = "Stock available"
+            holder.statusText.setTextColor(Color.BLACK)
+        }
+
+        holder.itemView.setOnClickListener {
             onClick(medicine)
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int {
+        return items.size
+    }
 
     fun updateData(newItems: List<Medicine>) {
         items = newItems
         notifyDataSetChanged()
+    }
+
+    fun filter(query: String) {
+        val filteredItems = if (query.isBlank()) {
+            MedicineRepository.getAll()
+        } else {
+            MedicineRepository.getAll().filter {
+                it.name.contains(query, ignoreCase = true) ||
+                        it.category.contains(query, ignoreCase = true)
+            }
+        }
+
+        updateData(filteredItems)
     }
 }

@@ -2,87 +2,91 @@ package com.example.communitymedicineinventory
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class MedicineDetailsActivity : AppCompatActivity() {
 
-    companion object {
-        const val EXTRA_MEDICINE_ID = "medicine_id"
-    }
+    private var medicineId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_medicine_details)
 
-        val id = intent.getIntExtra(EXTRA_MEDICINE_ID, -1)
-        val medicine = MedicineRepository.getById(id)
+        medicineId = intent.getIntExtra(EXTRA_MEDICINE_ID, -1)
 
-        val layout = UiHelper.screen(this)
+        val editButton =
+            findViewById<Button>(R.id.editMedicineButton)
 
-        layout.addView(
-            UiHelper.title(this, "Medicine Details")
-        )
+        val backButton =
+            findViewById<Button>(R.id.backToInventoryButton)
 
-        if (medicine == null) {
-            layout.addView(
-                UiHelper.text(this, "Medicine record not found.")
+        editButton.setOnClickListener {
+            val intent = Intent(this, AddEditMedicineActivity::class.java)
+            intent.putExtra(
+                AddEditMedicineActivity.EXTRA_MEDICINE_ID,
+                medicineId
             )
-        } else {
-            layout.addView(
-                UiHelper.text(this, "ID: ${medicine.medicineId}")
-            )
-            layout.addView(
-                UiHelper.text(this, "Name: ${medicine.name}")
-            )
-            layout.addView(
-                UiHelper.text(this, "Category: ${medicine.category}")
-            )
-            layout.addView(
-                UiHelper.text(
-                    this,
-                    "Quantity: ${medicine.quantity} ${medicine.unit}"
-                )
-            )
-            layout.addView(
-                UiHelper.text(
-                    this, "Minimum stock: ${medicine.minimumStock}"
-                )
-            )
-            layout.addView(
-                UiHelper.text(
-                    this, "Expiration date: ${medicine.expirationDate}"
-                )
-            )
-            layout.addView(
-                UiHelper.text(
-                    this,
-                    if (medicine.isLowStock()) {
-                        "Status: LOW STOCK"
-                    } else {
-                        "Status: Stock available"
-                    }
-                )
-            )
-
-            layout.addView(
-                UiHelper.button(this, "Edit Medicine") {
-                    val editIntent = Intent(
-                        this, AddEditMedicineActivity::class.java
-                    )
-                    editIntent.putExtra(
-                        EXTRA_MEDICINE_ID,
-                        medicine.medicineId
-                    )
-                    startActivity(editIntent)
-                }
-            )
+            startActivity(intent)
         }
 
-        layout.addView(
-            UiHelper.button(this, "Back to Inventory") {
-                finish()
-            }
-        )
+        backButton.setOnClickListener {
+            finish()
+        }
 
-        setContentView(layout)
+        displayMedicine()
+    }
+
+    private fun displayMedicine() {
+        val medicine = MedicineRepository.getById(medicineId)
+
+        if (medicine == null) {
+            Toast.makeText(
+                this,
+                "Medicine record not found.",
+                Toast.LENGTH_SHORT
+            ).show()
+            finish()
+            return
+        }
+
+        findViewById<TextView>(R.id.detailId).text =
+            "Medicine ID: ${medicine.medicineId}"
+
+        findViewById<TextView>(R.id.detailName).text =
+            medicine.name
+
+        findViewById<TextView>(R.id.detailCategory).text =
+            "Category: ${medicine.category}"
+
+        findViewById<TextView>(R.id.detailQuantity).text =
+            "Quantity: ${medicine.quantity} ${medicine.unit}"
+
+        findViewById<TextView>(R.id.detailMinimum).text =
+            "Minimum Stock: ${medicine.minimumStock} ${medicine.unit}"
+
+        findViewById<TextView>(R.id.detailExpiration).text =
+            "Expiration Date: ${medicine.expirationDate}"
+
+        findViewById<TextView>(R.id.detailStatus).text =
+            if (medicine.isLowStock()) {
+                "Status: LOW STOCK - Restocking required"
+            } else {
+                "Status: Stock available"
+            }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (medicineId != -1) {
+            displayMedicine()
+        }
+    }
+
+    companion object {
+        const val EXTRA_MEDICINE_ID = "medicine_id"
     }
 }

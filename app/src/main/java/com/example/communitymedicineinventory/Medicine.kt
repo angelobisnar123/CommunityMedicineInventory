@@ -9,5 +9,7 @@ data class Medicine(
     var expirationDate: String,
     var unit: String
 ) {
-    fun isLowStock(): Boolean = quantity <= minimumStock
+    fun isLowStock(): Boolean {
+        return quantity <= minimumStock
+    }
 }

@@ -16,10 +16,11 @@ class MainActivity : AppCompatActivity() {
         val emailInput = findViewById<EditText>(R.id.emailInput)
         val passwordInput = findViewById<EditText>(R.id.passwordInput)
         val loginButton = findViewById<Button>(R.id.loginButton)
+        val registerButton = findViewById<Button>(R.id.registerButton)
 
         loginButton.setOnClickListener {
             val email = emailInput.text.toString().trim()
-            val password = passwordInput.text.toString()
+            val password = passwordInput.text.toString().trim()
 
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(
@@ -28,12 +29,14 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                val intent = Intent(
-                    this,
-                    DashboardActivity::class.java
-                )
+                val intent = Intent(this, DashboardActivity::class.java)
                 startActivity(intent)
+                finish()
             }
+        }
+
+        registerButton.setOnClickListener {
+            startActivity(Intent(this, RegisterActivity::class.java))
         }
     }
 }

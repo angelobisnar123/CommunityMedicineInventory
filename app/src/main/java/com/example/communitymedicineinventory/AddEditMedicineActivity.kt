@@ -1,138 +1,122 @@
 package com.example.communitymedicineinventory
 
 import android.os.Bundle
-import android.text.InputType
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class AddEditMedicineActivity : AppCompatActivity() {
 
-    private var medicineId = -1
+    private var medicineId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_add_edit_medicine)
 
-        medicineId = intent.getIntExtra(
-            MedicineDetailsActivity.EXTRA_MEDICINE_ID, -1
-        )
+        val formTitle = findViewById<TextView>(R.id.formTitle)
 
-        val existing = MedicineRepository.getById(medicineId)
-        val editing = existing != null
+        val nameInput = findViewById<EditText>(R.id.nameInput)
+        val categoryInput = findViewById<EditText>(R.id.categoryInput)
+        val quantityInput = findViewById<EditText>(R.id.quantityInput)
+        val minimumInput = findViewById<EditText>(R.id.minimumInput)
+        val expirationInput = findViewById<EditText>(R.id.expirationInput)
+        val unitInput = findViewById<EditText>(R.id.unitInput)
 
-        val layout = UiHelper.screen(this)
+        val saveButton =
+            findViewById<Button>(R.id.saveMedicineButton)
 
-        layout.addView(
-            UiHelper.title(
-                this,
-                if (editing) "Edit Medicine" else "Add Medicine"
-            )
-        )
+        val cancelButton =
+            findViewById<Button>(R.id.cancelButton)
 
-        val nameInput = UiHelper.input(this, "Medicine name")
-        val categoryInput = UiHelper.input(this, "Category")
-        val quantityInput = UiHelper.input(this, "Quantity")
-        val minimumInput = UiHelper.input(this, "Minimum stock")
-        val expirationInput =
-            UiHelper.input(this, "Expiration date (YYYY-MM-DD)")
-        val unitInput =
-            UiHelper.input(this, "Unit (tablets, bottles, etc.)")
+        medicineId = intent.getIntExtra(EXTRA_MEDICINE_ID, -1)
 
-        quantityInput.inputType = InputType.TYPE_CLASS_NUMBER
-        minimumInput.inputType = InputType.TYPE_CLASS_NUMBER
+        // Load existing medicine when editing.
+        if (medicineId != -1) {
+            formTitle.text = "Edit Medicine"
 
-        if (existing != null) {
-            nameInput.setText(existing.name)
-            categoryInput.setText(existing.category)
-            quantityInput.setText(existing.quantity.toString())
-            minimumInput.setText(existing.minimumStock.toString())
-            expirationInput.setText(existing.expirationDate)
-            unitInput.setText(existing.unit)
-        }
+            val medicine = MedicineRepository.getById(medicineId)
 
-        layout.addView(nameInput)
-        layout.addView(categoryInput)
-        layout.addView(quantityInput)
-        layout.addView(minimumInput)
-        layout.addView(expirationInput)
-        layout.addView(unitInput)
-
-        layout.addView(
-            UiHelper.button(this, "Save Medicine") {
-                val name = nameInput.text.toString().trim()
-                val category = categoryInput.text.toString().trim()
-                val quantity = quantityInput.text.toString().toIntOrNull()
-                val minimum = minimumInput.text.toString().toIntOrNull()
-                val expiration = expirationInput.text.toString().trim()
-                val unit = unitInput.text.toString().trim()
-
-                val dateFormat = SimpleDateFormat(
-                    "yyyy-MM-dd", Locale.US
-                ).apply {
-                    isLenient = false
-                }
-
-                val validDate = try {
-                    val date = dateFormat.parse(expiration)
-                    date != null &&
-                            dateFormat.format(date) == expiration
-                } catch (_: Exception) {
-                    false
-                }
-
-                if (
-                    name.isBlank() ||
-                    category.isBlank() ||
-                    quantity == null ||
-                    minimum == null ||
-                    quantity < 0 ||
-                    minimum < 0 ||
-                    unit.isBlank() ||
-                    !validDate
-                ) {
-                    Toast.makeText(
-                        this,
-                        "Check all fields and use YYYY-MM-DD for the date.",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    return@button
-                }
-
-                val medicine = Medicine(
-                    medicineId = if (editing) {
-                        medicineId
-                    } else {
-                        MedicineRepository.nextId()
-                    },
-                    name = name,
-                    category = category,
-                    quantity = quantity,
-                    minimumStock = minimum,
-                    expirationDate = expiration,
-                    unit = unit
-                )
-
-                MedicineRepository.save(medicine)
-
+            if (medicine != null) {
+                nameInput.setText(medicine.name)
+                categoryInput.setText(medicine.category)
+                quantityInput.setText(medicine.quantity.toString())
+                minimumInput.setText(medicine.minimumStock.toString())
+                expirationInput.setText(medicine.expirationDate)
+                unitInput.setText(medicine.unit)
+            } else {
                 Toast.makeText(
                     this,
-                    "Medicine saved successfully.",
+                    "Medicine record not found.",
                     Toast.LENGTH_SHORT
                 ).show()
-
                 finish()
+                return
             }
-        )
+        }
 
-        layout.addView(
-            UiHelper.button(this, "Cancel") {
-                finish()
+        saveButton.setOnClickListener {
+            val name = nameInput.text.toString().trim()
+            val category = categoryInput.text.toString().trim()
+            val quantityText = quantityInput.text.toString().trim()
+            val minimumText = minimumInput.text.toString().trim()
+            val expirationDate = expirationInput.text.toString().trim()
+            val unit = unitInput.text.toString().trim()
+
+            val quantity = quantityText.toIntOrNull()
+            val minimumStock = minimumText.toIntOrNull()
+
+            when {
+                name.isEmpty() -> nameInput.error = "Enter medicine name"
+                category.isEmpty() -> categoryInput.error = "Enter category"
+                quantity == null || quantity < 0 ->
+                    quantityInput.error = "Enter a valid quantity"
+
+                minimumStock == null || minimumStock < 0 ->
+                    minimumInput.error = "Enter a valid minimum stock"
+
+                !expirationDate.matches(
+                    Regex("^\\d{4}-\\d{2}-\\d{2}$")
+                ) -> expirationInput.error =
+                    "Use YYYY-MM-DD format"
+
+                unit.isEmpty() -> unitInput.error = "Enter medicine unit"
+
+                else -> {
+                    val medicine = Medicine(
+                        medicineId = if (medicineId == -1) {
+                            MedicineRepository.nextId()
+                        } else {
+                            medicineId
+                        },
+                        name = name,
+                        category = category,
+                        quantity = quantity,
+                        minimumStock = minimumStock,
+                        expirationDate = expirationDate,
+                        unit = unit
+                    )
+
+                    MedicineRepository.save(medicine)
+
+                    Toast.makeText(
+                        this,
+                        "Medicine saved successfully.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    finish()
+                }
             }
-        )
+        }
 
-        setContentView(
-            UiHelper.scrollable(this, layout)
-        )
+        cancelButton.setOnClickListener {
+            finish()
+        }
+    }
+
+    companion object {
+        const val EXTRA_MEDICINE_ID = "medicine_id"
     }
 }

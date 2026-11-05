@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="COMMUNITY MEDICINE"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.08" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="INVENTORY MANAGEMENT"
+            android:textColor="#777777"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/formTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="35dp"
+            android:text="Add Medicine"
+            android:textColor="#000000"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Enter the medicine information below."
+            android:textColor="#777777"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:background="#FFFFFF"
+            android:elevation="3dp"
+            android:orientation="vertical"
+            android:padding="18dp">
+
+            <EditText
+                android:id="@+id/nameInput"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:hint="Medicine name"
+                android:inputType="textCapWords"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/categoryInput"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:hint="Category"
+                android:inputType="textCapWords"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/quantityInput"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:hint="Quantity"
+                android:inputType="number"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/minimumInput"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:hint="Minimum stock"
+                android:inputType="number"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/expirationInput"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:hint="Expiration date (YYYY-MM-DD)"
+                android:inputType="date"
+                android:padding="12dp" />
+
+            <EditText
+                android:id="@+id/unitInput"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:hint="Unit (tablets, bottles, etc.)"
+                android:inputType="textCapWords"
+                android:padding="12dp" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/saveMedicineButton"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="#000000"
+            android:text="SAVE MEDICINE"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#EAEAEA"
+            android:text="CANCEL"
+            android:textColor="#000000"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+</ScrollView>

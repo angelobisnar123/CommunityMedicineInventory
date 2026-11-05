@@ -1,46 +1,72 @@
 package com.example.communitymedicineinventory
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class StockAlertsActivity : AppCompatActivity() {
 
+    private lateinit var adapter: MedicineAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_stock_alerts)
 
-        val layout = UiHelper.screen(this)
+        val description =
+            findViewById<TextView>(R.id.stockAlertDescription)
 
-        layout.addView(
-            UiHelper.title(this, "Stock Alerts")
-        )
+        val recyclerView =
+            findViewById<RecyclerView>(R.id.stockAlertsRecyclerView)
 
-        val lowStock = MedicineRepository.getLowStock()
+        val backButton =
+            findViewById<Button>(R.id.backToDashboardButton)
 
-        if (lowStock.isEmpty()) {
-            layout.addView(
-                UiHelper.text(this, "No low-stock medicines.")
+        adapter = MedicineAdapter(MedicineRepository.getLowStock()) { medicine ->
+            val intent = Intent(this, MedicineDetailsActivity::class.java)
+
+            intent.putExtra(
+                MedicineDetailsActivity.EXTRA_MEDICINE_ID,
+                medicine.medicineId
             )
-        } else {
-            lowStock.forEach { medicine ->
-                layout.addView(
-                    UiHelper.text(
-                        this,
-                        "${medicine.name}\n" +
-                                "Available: ${medicine.quantity} ${medicine.unit}\n" +
-                                "Minimum: ${medicine.minimumStock} ${medicine.unit}"
-                    )
-                )
-            }
+
+            startActivity(intent)
         }
 
-        layout.addView(
-            UiHelper.button(this, "Back to Dashboard") {
-                finish()
-            }
-        )
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
 
-        setContentView(
-            UiHelper.scrollable(this, layout)
-        )
+        backButton.setOnClickListener {
+            finish()
+        }
+
+        updateAlerts()
+    }
+
+    private fun updateAlerts() {
+        val lowStockMedicines = MedicineRepository.getLowStock()
+
+        adapter.updateData(lowStockMedicines)
+
+        val description =
+            findViewById<TextView>(R.id.stockAlertDescription)
+
+        description.text =
+            if (lowStockMedicines.isEmpty()) {
+                "No medicines have reached their minimum stock level."
+            } else {
+                "${lowStockMedicines.size} medicine(s) need restocking."
+            }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (::adapter.isInitialized) {
+            updateAlerts()
+        }
     }
 }

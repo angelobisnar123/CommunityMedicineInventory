@@ -4,7 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.widget.LinearLayout
+import android.widget.Button
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,40 +13,22 @@ import androidx.recyclerview.widget.RecyclerView
 class InventoryActivity : AppCompatActivity() {
 
     private lateinit var adapter: MedicineAdapter
-    private lateinit var searchInput: android.widget.EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_inventory)
 
-        val layout = UiHelper.screen(this)
+        val searchInput = findViewById<EditText>(R.id.searchInput)
+        val addMedicineButton =
+            findViewById<Button>(R.id.addMedicineButton)
 
-        layout.addView(
-            UiHelper.title(this, "Medicine Inventory")
-        )
+        val recyclerView =
+            findViewById<RecyclerView>(R.id.medicineRecyclerView)
 
-        searchInput = UiHelper.input(
-            this, "Search medicine or category"
-        )
-        layout.addView(searchInput)
+        val backButton = findViewById<Button>(R.id.backButton)
 
-        layout.addView(
-            UiHelper.button(this, "Add Medicine") {
-                startActivity(
-                    Intent(this, AddEditMedicineActivity::class.java)
-                )
-            }
-        )
-
-        val recyclerView = RecyclerView(this).apply {
-            layoutManager = LinearLayoutManager(this@InventoryActivity)
-        }
-
-        adapter = MedicineAdapter(
-            MedicineRepository.getAll()
-        ) { medicine ->
-            val intent = Intent(
-                this, MedicineDetailsActivity::class.java
-            )
+        adapter = MedicineAdapter(MedicineRepository.getAll()) { medicine ->
+            val intent = Intent(this, MedicineDetailsActivity::class.java)
             intent.putExtra(
                 MedicineDetailsActivity.EXTRA_MEDICINE_ID,
                 medicine.medicineId
@@ -53,56 +36,46 @@ class InventoryActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
-
-        layout.addView(
-            recyclerView,
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                0,
-                1f
-            )
-        )
-
-        layout.addView(
-            UiHelper.button(this, "Back to Dashboard") {
-                finish()
-            }
-        )
 
         searchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(
-                s: CharSequence?, start: Int,
-                count: Int, after: Int
-            ) = Unit
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {}
 
             override fun onTextChanged(
-                s: CharSequence?, start: Int,
-                before: Int, count: Int
+                s: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
             ) {
-                filterMedicines(s.toString())
+                adapter.filter(s.toString())
             }
 
-            override fun afterTextChanged(s: Editable?) = Unit
+            override fun afterTextChanged(s: Editable?) {}
         })
 
-        setContentView(layout)
+        addMedicineButton.setOnClickListener {
+            startActivity(
+                Intent(this, AddEditMedicineActivity::class.java)
+            )
+        }
+
+        backButton.setOnClickListener {
+            finish()
+        }
     }
 
     override fun onResume() {
         super.onResume()
 
         if (::adapter.isInitialized) {
-            filterMedicines(searchInput.text.toString())
+            val searchInput = findViewById<EditText>(R.id.searchInput)
+            adapter.filter(searchInput.text.toString())
         }
-    }
-
-    private fun filterMedicines(query: String) {
-        val filtered = MedicineRepository.getAll().filter {
-            it.name.contains(query.trim(), ignoreCase = true) ||
-                    it.category.contains(query.trim(), ignoreCase = true)
-        }
-
-        adapter.updateData(filtered)
     }
 }

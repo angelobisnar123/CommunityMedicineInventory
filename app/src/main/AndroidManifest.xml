@@ -8,15 +8,19 @@
         android:theme="@style/AppTheme">
 
         <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".StockAlertsActivity"
             android:exported="false" />
 
         <activity
-            android:name=".AddEditMedicineActivity"
+            android:name=".MedicineDetailsActivity"
             android:exported="false" />
 
         <activity
-            android:name=".MedicineDetailsActivity"
+            android:name=".AddEditMedicineActivity"
             android:exported="false" />
 
         <activity
