@@ -12,7 +12,6 @@
         android:gravity="center"
         android:padding="28dp">
 
-        <!-- App Logo -->
         <TextView
             android:layout_width="76dp"
             android:layout_height="76dp"
@@ -23,7 +22,6 @@
             android:textSize="25sp"
             android:textStyle="bold" />
 
-        <!-- App Title -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,87 +36,38 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="INVENTORY"
+            android:text="INVENTORY MANAGEMENT"
             android:textColor="#555555"
             android:textSize="15sp"
-            android:letterSpacing="0.2" />
+            android:letterSpacing="0.15" />
 
-        <!-- Welcome -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="45dp"
-            android:text="Welcome back"
+            android:text="Welcome!"
             android:textColor="#000000"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:gravity="center" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Sign in to manage your medicine inventory."
-            android:textColor="#777777"
-            android:textSize="14sp" />
-
-        <!-- Email -->
-        <EditText
-            android:id="@+id/emailInput"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:layout_marginTop="28dp"
-            android:padding="14dp"
-            android:background="@android:drawable/edit_text"
-            android:hint="Email address"
-            android:inputType="textEmailAddress"
-            android:autofillHints="emailAddress"
-            android:textColor="#000000"
-            android:textSize="15sp" />
-
-        <!-- Password -->
-        <EditText
-            android:id="@+id/passwordInput"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:layout_marginTop="14dp"
-            android:padding="14dp"
-            android:background="@android:drawable/edit_text"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:autofillHints="password"
-            android:textColor="#000000"
-            android:textSize="15sp" />
-
-        <!-- Login -->
-        <Button
-            android:id="@+id/loginButton"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:layout_marginTop="24dp"
-            android:backgroundTint="#000000"
-            android:text="LOGIN"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
-
-        <!-- Divider Text -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:gravity="center"
-            android:text="New to Community Medicine?"
-            android:textColor="#777777"
-            android:textSize="14sp" />
-
-        <!-- Register -->
-        <Button
-            android:id="@+id/registerButton"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
             android:layout_marginTop="8dp"
-            android:backgroundTint="#FFFFFF"
-            android:text="CREATE ACCOUNT"
-            android:textColor="#000000"
+            android:text="Manage your community medicine inventory in one place."
+            android:textColor="#777777"
+            android:textSize="14sp"
+            android:gravity="center" />
+
+        <Button
+            android:id="@+id/continueButton"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginTop="35dp"
+            android:backgroundTint="#000000"
+            android:text="GO TO DASHBOARD"
+            android:textColor="#FFFFFF"
             android:textStyle="bold" />
 
     </LinearLayout>
