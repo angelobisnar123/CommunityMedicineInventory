@@ -3,31 +3,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5F5"
-    android:padding="24dp">
+    android:background="#F2F7F4"
+    android:padding="22dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="COMMUNITY MEDICINE"
-        android:textColor="#000000"
+        android:textColor="#174D3A"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:letterSpacing="0.08" />
+        android:letterSpacing="0.04" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="INVENTORY MANAGEMENT"
-        android:textColor="#777777"
-        android:textSize="12sp" />
+        android:text="INVENTORY MANAGEMENT SYSTEM"
+        android:textColor="#81968A"
+        android:textSize="11sp"
+        android:letterSpacing="0.10" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="32dp"
         android:text="Medicine Inventory"
-        android:textColor="#000000"
+        android:textColor="#174D3A"
         android:textSize="27sp"
         android:textStyle="bold" />
 
@@ -35,40 +36,59 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:text="View and manage available medicines."
-        android:textColor="#777777"
-        android:textSize="14sp" />
+        android:text="Manage and monitor your available medicines."
+        android:textColor="#819087"
+        android:textSize="13sp" />
 
     <EditText
         android:id="@+id/searchInput"
         android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:layout_marginTop="24dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="23dp"
         android:background="#FFFFFF"
+        android:backgroundTint="#83B89B"
         android:hint="Search medicine or category"
         android:inputType="text"
         android:padding="14dp"
-        android:textColor="#000000" />
+        android:textColor="#174D3A"
+        android:textSize="14sp" />
 
     <Button
         android:id="@+id/addMedicineButton"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:layout_marginTop="14dp"
-        android:backgroundTint="#000000"
-        android:text="+ ADD MEDICINE"
+        android:layout_marginTop="13dp"
+        android:backgroundTint="#174D3A"
+        android:text="+  ADD NEW MEDICINE"
         android:textColor="#FFFFFF"
         android:textStyle="bold" />
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:text="MEDICINE RECORDS"
-        android:textColor="#000000"
-        android:textSize="13sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.08" />
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="MEDICINE RECORDS"
+            android:textColor="#174D3A"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.08" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="INVENTORY"
+            android:textColor="#779184"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/medicineRecyclerView"
@@ -77,16 +97,17 @@
         android:layout_weight="1"
         android:layout_marginTop="12dp"
         android:background="#FFFFFF"
-        android:padding="8dp" />
+        android:padding="10dp"
+        android:clipToPadding="false" />
 
     <Button
         android:id="@+id/backButton"
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:layout_marginTop="12dp"
-        android:backgroundTint="#EAEAEA"
+        android:backgroundTint="#DCE7E0"
         android:text="BACK TO DASHBOARD"
-        android:textColor="#000000"
+        android:textColor="#426452"
         android:textStyle="bold" />
 
 </LinearLayout>

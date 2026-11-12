@@ -2,30 +2,31 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
+    android:background="#F2F7F4"
     android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="22dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="COMMUNITY MEDICINE"
-            android:textColor="#000000"
+            android:textColor="#174D3A"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:letterSpacing="0.08" />
+            android:letterSpacing="0.04" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="INVENTORY MANAGEMENT"
-            android:textColor="#777777"
-            android:textSize="12sp" />
+            android:text="INVENTORY MANAGEMENT SYSTEM"
+            android:textColor="#81968A"
+            android:textSize="11sp"
+            android:letterSpacing="0.10" />
 
         <TextView
             android:id="@+id/formTitle"
@@ -33,16 +34,16 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="35dp"
             android:text="Add Medicine"
-            android:textColor="#000000"
-            android:textSize="28sp"
+            android:textColor="#174D3A"
+            android:textSize="29sp"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="Enter the medicine information below."
-            android:textColor="#777777"
+            android:text="Complete the information to register a medicine."
+            android:textColor="#819087"
             android:textSize="14sp" />
 
         <LinearLayout
@@ -52,64 +53,123 @@
             android:background="#FFFFFF"
             android:elevation="3dp"
             android:orientation="vertical"
-            android:padding="18dp">
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="MEDICINE INFORMATION"
+                android:textColor="#174D3A"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08" />
 
             <EditText
                 android:id="@+id/nameInput"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#83B89B"
                 android:hint="Medicine name"
                 android:inputType="textCapWords"
-                android:padding="12dp" />
+                android:padding="12dp"
+                android:textColor="#174D3A" />
 
             <EditText
                 android:id="@+id/categoryInput"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#83B89B"
                 android:hint="Category"
                 android:inputType="textCapWords"
-                android:padding="12dp" />
+                android:padding="12dp"
+                android:textColor="#174D3A" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="18dp"
+                android:background="#E1EBE4" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="STOCK INFORMATION"
+                android:textColor="#174D3A"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08" />
 
             <EditText
                 android:id="@+id/quantityInput"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:hint="Quantity"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#83B89B"
+                android:hint="Current quantity"
                 android:inputType="number"
-                android:padding="12dp" />
+                android:padding="12dp"
+                android:textColor="#174D3A" />
 
             <EditText
                 android:id="@+id/minimumInput"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:hint="Minimum stock"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#83B89B"
+                android:hint="Minimum stock level"
                 android:inputType="number"
-                android:padding="12dp" />
-
-            <EditText
-                android:id="@+id/expirationInput"
-                android:layout_width="match_parent"
-                android:layout_height="55dp"
-                android:hint="Expiration date (YYYY-MM-DD)"
-                android:inputType="date"
-                android:padding="12dp" />
+                android:padding="12dp"
+                android:textColor="#174D3A" />
 
             <EditText
                 android:id="@+id/unitInput"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#83B89B"
                 android:hint="Unit (tablets, bottles, etc.)"
                 android:inputType="textCapWords"
-                android:padding="12dp" />
+                android:padding="12dp"
+                android:textColor="#174D3A" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="18dp"
+                android:background="#E1EBE4" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="EXPIRATION INFORMATION"
+                android:textColor="#174D3A"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08" />
+
+            <EditText
+                android:id="@+id/expirationInput"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#83B89B"
+                android:hint="Expiration date (YYYY-MM-DD)"
+                android:inputType="date"
+                android:padding="12dp"
+                android:textColor="#174D3A" />
 
         </LinearLayout>
 
         <Button
             android:id="@+id/saveMedicineButton"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="56dp"
             android:layout_marginTop="24dp"
-            android:backgroundTint="#000000"
+            android:backgroundTint="#174D3A"
             android:text="SAVE MEDICINE"
             android:textColor="#FFFFFF"
             android:textStyle="bold" />
@@ -117,11 +177,11 @@
         <Button
             android:id="@+id/cancelButton"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="54dp"
             android:layout_marginTop="10dp"
-            android:backgroundTint="#EAEAEA"
+            android:backgroundTint="#DCE7E0"
             android:text="CANCEL"
-            android:textColor="#000000"
+            android:textColor="#426452"
             android:textStyle="bold" />
 
     </LinearLayout>

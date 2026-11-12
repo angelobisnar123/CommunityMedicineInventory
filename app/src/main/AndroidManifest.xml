@@ -8,10 +8,6 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".RegisterActivity"
-            android:exported="false" />
-
-        <activity
             android:name=".StockAlertsActivity"
             android:exported="false" />
 
