@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "606497490109",
+    "project_id": "communitymedicineinventory",
+    "storage_bucket": "communitymedicineinventory.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:606497490109:android:ce5acf76b8c263ab38e3d4",
+        "android_client_info": {
+          "package_name": "com.example.communitymedicineinventory"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzwqGbEfrmzuznmUNCie1INS7RJ69MHL4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

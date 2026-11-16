@@ -1,4 +1,3 @@
-
 package com.example.communitymedicineinventory
 
 import android.content.Context

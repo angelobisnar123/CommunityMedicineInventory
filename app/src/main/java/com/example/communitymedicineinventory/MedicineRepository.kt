@@ -1,46 +1,109 @@
 package com.example.communitymedicineinventory
 
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+
 object MedicineRepository {
 
-    private val medicines = mutableListOf(
-        Medicine(1, "Paracetamol", "Pain Reliever", 120, 30, "2027-08-15", "tablets"),
-        Medicine(2, "Amoxicillin", "Antibiotic", 20, 25, "2027-05-20", "capsules"),
-        Medicine(3, "Cetirizine", "Antihistamine", 60, 15, "2027-11-10", "tablets")
-    )
+    private val medicinesRef =
+        FirebaseDatabase.getInstance().getReference("medicines")
 
-    fun getAll(): List<Medicine> {
-        return medicines.toList()
-    }
+    fun observeAll(
+        onDataChanged: (List<Medicine>) -> Unit,
+        onError: (String) -> Unit
+    ): ValueEventListener {
 
-    fun getById(id: Int): Medicine? {
-        return medicines.find { it.medicineId == id }
-    }
+        val listener = object : ValueEventListener {
 
-    fun getLowStock(): List<Medicine> {
-        return medicines.filter { it.isLowStock() }
-    }
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val medicines = mutableListOf<Medicine>()
 
-    fun nextId(): Int {
-        return (medicines.maxOfOrNull { it.medicineId } ?: 0) + 1
-    }
+                for (child in snapshot.children) {
+                    val medicine = child.getValue(Medicine::class.java)
 
-    fun save(medicine: Medicine) {
-        val index = medicines.indexOfFirst {
-            it.medicineId == medicine.medicineId
+                    if (medicine != null) {
+                        medicine.medicineId = child.key ?: ""
+                        medicines.add(medicine)
+                    }
+                }
+
+                onDataChanged(medicines)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                onError(error.message)
+            }
         }
 
-        if (index >= 0) {
-            medicines[index] = medicine
-        } else {
-            medicines.add(medicine)
+        medicinesRef.addValueEventListener(listener)
+        return listener
+    }
+
+    fun removeListener(listener: ValueEventListener) {
+        medicinesRef.removeEventListener(listener)
+    }
+
+    fun save(
+        medicine: Medicine,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val id = medicine.medicineId.ifBlank {
+            medicinesRef.push().key ?: ""
         }
+
+        if (id.isBlank()) {
+            onError("Unable to generate medicine ID.")
+            return
+        }
+
+        medicine.medicineId = id
+
+        medicinesRef.child(id)
+            .setValue(medicine)
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Failed to save medicine.")
+            }
     }
 
-    fun totalMedicines(): Int {
-        return medicines.size
+    fun getById(
+        id: String,
+        onResult: (Medicine?) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        medicinesRef.child(id)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val medicine = snapshot.getValue(Medicine::class.java)
+
+                if (medicine != null) {
+                    medicine.medicineId = id
+                }
+
+                onResult(medicine)
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Failed to retrieve medicine.")
+            }
     }
 
-    fun lowStockCount(): Int {
-        return getLowStock().size
+    fun delete(
+        id: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        medicinesRef.child(id)
+            .removeValue()
+            .addOnSuccessListener {
+                onSuccess()
+            }
+            .addOnFailureListener {
+                onError(it.message ?: "Failed to delete medicine.")
+            }
     }
 }

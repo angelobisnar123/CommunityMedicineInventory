@@ -4,69 +4,85 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.database.ValueEventListener
 
 class StockAlertsActivity : AppCompatActivity() {
 
+    private lateinit var stockAlertDescription: TextView
+    private lateinit var stockAlertsRecyclerView: RecyclerView
+    private lateinit var backToDashboardButton: Button
+
     private lateinit var adapter: MedicineAdapter
+
+    private var databaseListener: ValueEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stock_alerts)
 
-        val description =
-            findViewById<TextView>(R.id.stockAlertDescription)
+        stockAlertDescription =
+            findViewById(R.id.stockAlertDescription)
 
-        val recyclerView =
-            findViewById<RecyclerView>(R.id.stockAlertsRecyclerView)
+        stockAlertsRecyclerView =
+            findViewById(R.id.stockAlertsRecyclerView)
 
-        val backButton =
-            findViewById<Button>(R.id.backToDashboardButton)
+        backToDashboardButton =
+            findViewById(R.id.backToDashboardButton)
 
-        adapter = MedicineAdapter(MedicineRepository.getLowStock()) { medicine ->
-            val intent = Intent(this, MedicineDetailsActivity::class.java)
-
-            intent.putExtra(
-                MedicineDetailsActivity.EXTRA_MEDICINE_ID,
-                medicine.medicineId
+        adapter = MedicineAdapter(emptyList()) { medicine ->
+            val intent = Intent(
+                this,
+                MedicineDetailsActivity::class.java
             )
 
+            intent.putExtra("MEDICINE_ID", medicine.medicineId)
             startActivity(intent)
         }
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
+        stockAlertsRecyclerView.layoutManager =
+            LinearLayoutManager(this)
 
-        backButton.setOnClickListener {
+        stockAlertsRecyclerView.adapter = adapter
+
+        backToDashboardButton.setOnClickListener {
             finish()
         }
-
-        updateAlerts()
     }
 
-    private fun updateAlerts() {
-        val lowStockMedicines = MedicineRepository.getLowStock()
+    override fun onStart() {
+        super.onStart()
 
-        adapter.updateData(lowStockMedicines)
+        databaseListener = MedicineRepository.observeAll(
+            onDataChanged = { medicines ->
+                val lowStockMedicines =
+                    medicines.filter { it.isLowStock() }
 
-        val description =
-            findViewById<TextView>(R.id.stockAlertDescription)
+                adapter.updateList(lowStockMedicines)
 
-        description.text =
-            if (lowStockMedicines.isEmpty()) {
-                "No medicines have reached their minimum stock level."
-            } else {
-                "${lowStockMedicines.size} medicine(s) need restocking."
+                stockAlertDescription.text =
+                    if (lowStockMedicines.isEmpty()) {
+                        "All medicines have sufficient stock."
+                    } else {
+                        "${lowStockMedicines.size} medicine(s) need restocking."
+                    }
+            },
+            onError = { error ->
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show()
             }
+        )
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStop() {
+        super.onStop()
 
-        if (::adapter.isInitialized) {
-            updateAlerts()
+        databaseListener?.let {
+            MedicineRepository.removeListener(it)
         }
+
+        databaseListener = null
     }
 }

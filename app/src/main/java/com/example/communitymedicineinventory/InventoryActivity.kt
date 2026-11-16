@@ -6,38 +6,51 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.database.ValueEventListener
 
 class InventoryActivity : AppCompatActivity() {
 
+    private lateinit var searchInput: EditText
+    private lateinit var addMedicineButton: Button
+    private lateinit var medicineRecyclerView: RecyclerView
+    private lateinit var backButton: Button
+
     private lateinit var adapter: MedicineAdapter
+
+    private var allMedicines = listOf<Medicine>()
+    private var databaseListener: ValueEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_inventory)
 
-        val searchInput = findViewById<EditText>(R.id.searchInput)
-        val addMedicineButton =
-            findViewById<Button>(R.id.addMedicineButton)
+        searchInput = findViewById(R.id.searchInput)
+        addMedicineButton = findViewById(R.id.addMedicineButton)
+        medicineRecyclerView = findViewById(R.id.medicineRecyclerView)
+        backButton = findViewById(R.id.backButton)
 
-        val recyclerView =
-            findViewById<RecyclerView>(R.id.medicineRecyclerView)
-
-        val backButton = findViewById<Button>(R.id.backButton)
-
-        adapter = MedicineAdapter(MedicineRepository.getAll()) { medicine ->
+        adapter = MedicineAdapter(emptyList()) { medicine ->
             val intent = Intent(this, MedicineDetailsActivity::class.java)
-            intent.putExtra(
-                MedicineDetailsActivity.EXTRA_MEDICINE_ID,
-                medicine.medicineId
-            )
+            intent.putExtra("MEDICINE_ID", medicine.medicineId)
             startActivity(intent)
         }
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
+        medicineRecyclerView.layoutManager = LinearLayoutManager(this)
+        medicineRecyclerView.adapter = adapter
+
+        addMedicineButton.setOnClickListener {
+            startActivity(
+                Intent(this, AddEditMedicineActivity::class.java)
+            )
+        }
+
+        backButton.setOnClickListener {
+            finish()
+        }
 
         searchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(
@@ -53,29 +66,43 @@ class InventoryActivity : AppCompatActivity() {
                 before: Int,
                 count: Int
             ) {
-                adapter.filter(s.toString())
+                filterMedicines(s.toString())
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
-
-        addMedicineButton.setOnClickListener {
-            startActivity(
-                Intent(this, AddEditMedicineActivity::class.java)
-            )
-        }
-
-        backButton.setOnClickListener {
-            finish()
-        }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
 
-        if (::adapter.isInitialized) {
-            val searchInput = findViewById<EditText>(R.id.searchInput)
-            adapter.filter(searchInput.text.toString())
+        databaseListener = MedicineRepository.observeAll(
+            onDataChanged = { medicines ->
+                allMedicines = medicines
+                filterMedicines(searchInput.text.toString())
+            },
+            onError = { error ->
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+            }
+        )
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        databaseListener?.let {
+            MedicineRepository.removeListener(it)
         }
+
+        databaseListener = null
+    }
+
+    private fun filterMedicines(query: String) {
+        val filtered = allMedicines.filter {
+            it.name.contains(query, ignoreCase = true) ||
+                    it.category.contains(query, ignoreCase = true)
+        }
+
+        adapter.updateList(filtered)
     }
 }

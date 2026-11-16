@@ -9,84 +9,99 @@ import androidx.appcompat.app.AppCompatActivity
 
 class MedicineDetailsActivity : AppCompatActivity() {
 
-    private var medicineId: Int = -1
+    private lateinit var detailId: TextView
+    private lateinit var detailName: TextView
+    private lateinit var detailCategory: TextView
+    private lateinit var detailQuantity: TextView
+    private lateinit var detailMinimum: TextView
+    private lateinit var detailExpiration: TextView
+    private lateinit var detailStatus: TextView
+
+    private lateinit var editMedicineButton: Button
+    private lateinit var backToInventoryButton: Button
+
+    private var medicineId = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_medicine_details)
 
-        medicineId = intent.getIntExtra(EXTRA_MEDICINE_ID, -1)
+        detailId = findViewById(R.id.detailId)
+        detailName = findViewById(R.id.detailName)
+        detailCategory = findViewById(R.id.detailCategory)
+        detailQuantity = findViewById(R.id.detailQuantity)
+        detailMinimum = findViewById(R.id.detailMinimum)
+        detailExpiration = findViewById(R.id.detailExpiration)
+        detailStatus = findViewById(R.id.detailStatus)
 
-        val editButton =
-            findViewById<Button>(R.id.editMedicineButton)
+        editMedicineButton = findViewById(R.id.editMedicineButton)
+        backToInventoryButton = findViewById(R.id.backToInventoryButton)
 
-        val backButton =
-            findViewById<Button>(R.id.backToInventoryButton)
+        medicineId = intent.getStringExtra("MEDICINE_ID") ?: ""
 
-        editButton.setOnClickListener {
+        editMedicineButton.setOnClickListener {
             val intent = Intent(this, AddEditMedicineActivity::class.java)
-            intent.putExtra(
-                AddEditMedicineActivity.EXTRA_MEDICINE_ID,
-                medicineId
-            )
+            intent.putExtra("MEDICINE_ID", medicineId)
             startActivity(intent)
         }
 
-        backButton.setOnClickListener {
+        backToInventoryButton.setOnClickListener {
             finish()
         }
 
-        displayMedicine()
+        loadMedicine()
     }
 
-    private fun displayMedicine() {
-        val medicine = MedicineRepository.getById(medicineId)
+    override fun onResume() {
+        super.onResume()
 
-        if (medicine == null) {
+        if (medicineId.isNotBlank()) {
+            loadMedicine()
+        }
+    }
+
+    private fun loadMedicine() {
+        if (medicineId.isBlank()) {
             Toast.makeText(
                 this,
-                "Medicine record not found.",
+                "Invalid medicine ID.",
                 Toast.LENGTH_SHORT
             ).show()
             finish()
             return
         }
 
-        findViewById<TextView>(R.id.detailId).text =
-            "Medicine ID: ${medicine.medicineId}"
+        MedicineRepository.getById(
+            medicineId,
+            onResult = { medicine ->
+                if (medicine == null) {
+                    Toast.makeText(
+                        this,
+                        "Medicine not found.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    finish()
+                    return@getById
+                }
 
-        findViewById<TextView>(R.id.detailName).text =
-            medicine.name
+                detailId.text = "Medicine ID: ${medicine.medicineId}"
+                detailName.text = medicine.name
+                detailCategory.text = medicine.category
+                detailQuantity.text =
+                    "${medicine.quantity} ${medicine.unit}"
+                detailMinimum.text =
+                    medicine.minimumStock.toString()
+                detailExpiration.text = medicine.expirationDate
 
-        findViewById<TextView>(R.id.detailCategory).text =
-            "Category: ${medicine.category}"
-
-        findViewById<TextView>(R.id.detailQuantity).text =
-            "Quantity: ${medicine.quantity} ${medicine.unit}"
-
-        findViewById<TextView>(R.id.detailMinimum).text =
-            "Minimum Stock: ${medicine.minimumStock} ${medicine.unit}"
-
-        findViewById<TextView>(R.id.detailExpiration).text =
-            "Expiration Date: ${medicine.expirationDate}"
-
-        findViewById<TextView>(R.id.detailStatus).text =
-            if (medicine.isLowStock()) {
-                "Status: LOW STOCK - Restocking required"
-            } else {
-                "Status: Stock available"
+                detailStatus.text = if (medicine.isLowStock()) {
+                    "Low Stock"
+                } else {
+                    "Available"
+                }
+            },
+            onError = { error ->
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show()
             }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        if (medicineId != -1) {
-            displayMedicine()
-        }
-    }
-
-    companion object {
-        const val EXTRA_MEDICINE_ID = "medicine_id"
+        )
     }
 }

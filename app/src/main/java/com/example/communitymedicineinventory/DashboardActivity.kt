@@ -4,28 +4,31 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.database.ValueEventListener
 
 class DashboardActivity : AppCompatActivity() {
+
+    private lateinit var totalText: TextView
+    private lateinit var lowStockText: TextView
+
+    private lateinit var inventoryButton: Button
+    private lateinit var stockAlertsButton: Button
+    private lateinit var logoutButton: Button
+
+    private var databaseListener: ValueEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
-        val totalText = findViewById<TextView>(R.id.totalText)
-        val lowStockText = findViewById<TextView>(R.id.lowStockText)
+        totalText = findViewById(R.id.totalText)
+        lowStockText = findViewById(R.id.lowStockText)
 
-        val inventoryButton =
-            findViewById<Button>(R.id.inventoryButton)
-
-        val stockAlertsButton =
-            findViewById<Button>(R.id.stockAlertsButton)
-
-        val logoutButton =
-            findViewById<Button>(R.id.logoutButton)
-
-        totalText.text = MedicineRepository.totalMedicines().toString()
-        lowStockText.text = MedicineRepository.lowStockCount().toString()
+        inventoryButton = findViewById(R.id.inventoryButton)
+        stockAlertsButton = findViewById(R.id.stockAlertsButton)
+        logoutButton = findViewById(R.id.logoutButton)
 
         inventoryButton.setOnClickListener {
             startActivity(
@@ -50,13 +53,31 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
 
-        findViewById<TextView>(R.id.totalText).text =
-            MedicineRepository.totalMedicines().toString()
+        databaseListener = MedicineRepository.observeAll(
+            onDataChanged = { medicines ->
+                totalText.text = medicines.size.toString()
 
-        findViewById<TextView>(R.id.lowStockText).text =
-            MedicineRepository.lowStockCount().toString()
+                val lowStockCount =
+                    medicines.count { it.isLowStock() }
+
+                lowStockText.text = lowStockCount.toString()
+            },
+            onError = { error ->
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+            }
+        )
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        databaseListener?.let {
+            MedicineRepository.removeListener(it)
+        }
+
+        databaseListener = null
     }
 }
