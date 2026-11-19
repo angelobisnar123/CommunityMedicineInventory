@@ -1,3 +1,4 @@
+
 package com.example.communitymedicineinventory
 
 import android.content.Intent
@@ -6,6 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ValueEventListener
 
 class DashboardActivity : AppCompatActivity() {
@@ -19,8 +21,36 @@ class DashboardActivity : AppCompatActivity() {
 
     private var databaseListener: ValueEventListener? = null
 
+    private var userRole: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Get the role passed from LoginActivity.
+        userRole = intent.getStringExtra("USER_ROLE") ?: ""
+
+        // Allow only Inventory Custodian and Health Worker here.
+        // Admin uses AdminDashboardActivity.
+        if (
+            userRole != "inventory_custodian" &&
+            userRole != "health_worker"
+        ) {
+            Toast.makeText(
+                this,
+                "Unauthorized access.",
+                Toast.LENGTH_LONG
+            ).show()
+
+            returnToLogin()
+            return
+        }
+
+        // Check Firebase authentication.
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            returnToLogin()
+            return
+        }
+
         setContentView(R.layout.activity_dashboard)
 
         totalText = findViewById(R.id.totalText)
@@ -30,34 +60,54 @@ class DashboardActivity : AppCompatActivity() {
         stockAlertsButton = findViewById(R.id.stockAlertsButton)
         logoutButton = findViewById(R.id.logoutButton)
 
+        // Open Inventory.
         inventoryButton.setOnClickListener {
-            startActivity(
-                Intent(this, InventoryActivity::class.java)
-            )
-        }
 
-        stockAlertsButton.setOnClickListener {
-            startActivity(
-                Intent(this, StockAlertsActivity::class.java)
+            val intent = Intent(
+                this,
+                InventoryActivity::class.java
             )
-        }
 
-        logoutButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags =
-                Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TASK
+            intent.putExtra("USER_ROLE", userRole)
 
             startActivity(intent)
-            finish()
+        }
+
+        // Open Stock Alerts.
+        stockAlertsButton.setOnClickListener {
+
+            val intent = Intent(
+                this,
+                StockAlertsActivity::class.java
+            )
+
+            intent.putExtra("USER_ROLE", userRole)
+
+            startActivity(intent)
+        }
+
+        // Logout.
+        logoutButton.setOnClickListener {
+
+            FirebaseAuth.getInstance().signOut()
+            returnToLogin()
         }
     }
 
     override fun onStart() {
         super.onStart()
 
+        if (
+            userRole != "inventory_custodian" &&
+            userRole != "health_worker"
+        ) {
+            return
+        }
+
         databaseListener = MedicineRepository.observeAll(
+
             onDataChanged = { medicines ->
+
                 totalText.text = medicines.size.toString()
 
                 val lowStockCount =
@@ -65,8 +115,13 @@ class DashboardActivity : AppCompatActivity() {
 
                 lowStockText.text = lowStockCount.toString()
             },
+
             onError = { error ->
-                Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    error,
+                    Toast.LENGTH_LONG
+                ).show()
             }
         )
     }
@@ -79,5 +134,20 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         databaseListener = null
+    }
+
+    private fun returnToLogin() {
+
+        val intent = Intent(
+            this,
+            LoginActivity::class.java
+        )
+
+        intent.flags =
+            Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+        startActivity(intent)
+        finish()
     }
 }

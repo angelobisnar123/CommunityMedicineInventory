@@ -1,3 +1,4 @@
+
 package com.example.communitymedicineinventory
 
 import android.content.Intent
@@ -19,9 +20,29 @@ class StockAlertsActivity : AppCompatActivity() {
     private lateinit var adapter: MedicineAdapter
 
     private var databaseListener: ValueEventListener? = null
+    private var userRole: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        userRole = intent.getStringExtra("USER_ROLE") ?: ""
+
+        // Allow only recognized roles.
+        if (
+            userRole != "admin" &&
+            userRole != "inventory_custodian" &&
+            userRole != "health_worker"
+        ) {
+            Toast.makeText(
+                this,
+                "Unauthorized access.",
+                Toast.LENGTH_LONG
+            ).show()
+
+            finish()
+            return
+        }
+
         setContentView(R.layout.activity_stock_alerts)
 
         stockAlertDescription =
@@ -34,12 +55,15 @@ class StockAlertsActivity : AppCompatActivity() {
             findViewById(R.id.backToDashboardButton)
 
         adapter = MedicineAdapter(emptyList()) { medicine ->
+
             val intent = Intent(
                 this,
                 MedicineDetailsActivity::class.java
             )
 
             intent.putExtra("MEDICINE_ID", medicine.medicineId)
+            intent.putExtra("USER_ROLE", userRole)
+
             startActivity(intent)
         }
 
@@ -56,8 +80,19 @@ class StockAlertsActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 
+        // Do not load data for unauthorized users.
+        if (
+            userRole != "admin" &&
+            userRole != "inventory_custodian" &&
+            userRole != "health_worker"
+        ) {
+            return
+        }
+
         databaseListener = MedicineRepository.observeAll(
+
             onDataChanged = { medicines ->
+
                 val lowStockMedicines =
                     medicines.filter { it.isLowStock() }
 
@@ -70,8 +105,13 @@ class StockAlertsActivity : AppCompatActivity() {
                         "${lowStockMedicines.size} medicine(s) need restocking."
                     }
             },
+
             onError = { error ->
-                Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    error,
+                    Toast.LENGTH_LONG
+                ).show()
             }
         )
     }

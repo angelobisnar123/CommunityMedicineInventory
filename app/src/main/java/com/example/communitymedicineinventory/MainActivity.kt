@@ -11,11 +11,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val continueButton =
-            findViewById<Button>(R.id.continueButton)
+        val continueButton = findViewById<Button>(R.id.continueButton)
 
         continueButton.setOnClickListener {
-            val intent = Intent(this, DashboardActivity::class.java)
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
     }

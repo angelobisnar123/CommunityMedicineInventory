@@ -1,3 +1,4 @@
+
 package com.example.communitymedicineinventory
 
 import com.google.firebase.database.DataSnapshot
@@ -7,8 +8,9 @@ import com.google.firebase.database.ValueEventListener
 
 object MedicineRepository {
 
-    private val medicinesRef =
-        FirebaseDatabase.getInstance().getReference("medicines")
+    private val medicinesRef = FirebaseDatabase.getInstance(
+        "https://communitymedicineinventory-default-rtdb.asia-southeast1.firebasedatabase.app"
+    ).getReference("medicines")
 
     fun observeAll(
         onDataChanged: (List<Medicine>) -> Unit,
@@ -18,9 +20,11 @@ object MedicineRepository {
         val listener = object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
+
                 val medicines = mutableListOf<Medicine>()
 
                 for (child in snapshot.children) {
+
                     val medicine = child.getValue(Medicine::class.java)
 
                     if (medicine != null) {
@@ -38,6 +42,7 @@ object MedicineRepository {
         }
 
         medicinesRef.addValueEventListener(listener)
+
         return listener
     }
 
@@ -50,6 +55,7 @@ object MedicineRepository {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
+
         val id = medicine.medicineId.ifBlank {
             medicinesRef.push().key ?: ""
         }
@@ -76,9 +82,11 @@ object MedicineRepository {
         onResult: (Medicine?) -> Unit,
         onError: (String) -> Unit
     ) {
+
         medicinesRef.child(id)
             .get()
             .addOnSuccessListener { snapshot ->
+
                 val medicine = snapshot.getValue(Medicine::class.java)
 
                 if (medicine != null) {
@@ -97,6 +105,7 @@ object MedicineRepository {
         onSuccess: () -> Unit,
         onError: (String) -> Unit
     ) {
+
         medicinesRef.child(id)
             .removeValue()
             .addOnSuccessListener {

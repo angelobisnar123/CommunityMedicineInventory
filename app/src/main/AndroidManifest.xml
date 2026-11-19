@@ -1,12 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:label="Community Medicine Inventory"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!-- Authentication -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+
+        <!-- Admin -->
+        <activity
+            android:name=".AdminDashboardActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".CreateStaffActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".StaffListActivity"
+            android:exported="false" />
+
+        <!-- Medicine Inventory -->
         <activity
             android:name=".StockAlertsActivity"
             android:exported="false" />
@@ -27,6 +48,7 @@
             android:name=".DashboardActivity"
             android:exported="false" />
 
+        <!-- Launcher -->
         <activity
             android:name=".MainActivity"
             android:exported="true">

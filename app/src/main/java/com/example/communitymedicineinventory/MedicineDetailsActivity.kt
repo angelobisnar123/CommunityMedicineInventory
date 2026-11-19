@@ -1,7 +1,9 @@
+
 package com.example.communitymedicineinventory
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -21,9 +23,29 @@ class MedicineDetailsActivity : AppCompatActivity() {
     private lateinit var backToInventoryButton: Button
 
     private var medicineId = ""
+    private var userRole = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        medicineId = intent.getStringExtra("MEDICINE_ID") ?: ""
+        userRole = intent.getStringExtra("USER_ROLE") ?: ""
+
+        // Allow Admin, Inventory Custodian, and Health Worker.
+        if (
+            userRole != "admin" &&
+            userRole != "inventory_custodian" &&
+            userRole != "health_worker"
+        ) {
+            Toast.makeText(
+                this,
+                "Unauthorized access.",
+                Toast.LENGTH_LONG
+            ).show()
+            finish()
+            return
+        }
+
         setContentView(R.layout.activity_medicine_details)
 
         detailId = findViewById(R.id.detailId)
@@ -37,11 +59,36 @@ class MedicineDetailsActivity : AppCompatActivity() {
         editMedicineButton = findViewById(R.id.editMedicineButton)
         backToInventoryButton = findViewById(R.id.backToInventoryButton)
 
-        medicineId = intent.getStringExtra("MEDICINE_ID") ?: ""
+        // Health Workers can only view medicine details.
+        editMedicineButton.visibility =
+            if (userRole == "health_worker") {
+                View.GONE
+            } else {
+                View.VISIBLE
+            }
 
         editMedicineButton.setOnClickListener {
-            val intent = Intent(this, AddEditMedicineActivity::class.java)
+
+            if (
+                userRole != "admin" &&
+                userRole != "inventory_custodian"
+            ) {
+                Toast.makeText(
+                    this,
+                    "You do not have permission to edit medicines.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+
+            val intent = Intent(
+                this,
+                AddEditMedicineActivity::class.java
+            )
+
             intent.putExtra("MEDICINE_ID", medicineId)
+            intent.putExtra("USER_ROLE", userRole)
+
             startActivity(intent)
         }
 
@@ -61,6 +108,7 @@ class MedicineDetailsActivity : AppCompatActivity() {
     }
 
     private fun loadMedicine() {
+
         if (medicineId.isBlank()) {
             Toast.makeText(
                 this,
@@ -73,7 +121,9 @@ class MedicineDetailsActivity : AppCompatActivity() {
 
         MedicineRepository.getById(
             medicineId,
+
             onResult = { medicine ->
+
                 if (medicine == null) {
                     Toast.makeText(
                         this,
@@ -87,20 +137,29 @@ class MedicineDetailsActivity : AppCompatActivity() {
                 detailId.text = "Medicine ID: ${medicine.medicineId}"
                 detailName.text = medicine.name
                 detailCategory.text = medicine.category
+
                 detailQuantity.text =
                     "${medicine.quantity} ${medicine.unit}"
+
                 detailMinimum.text =
                     medicine.minimumStock.toString()
+
                 detailExpiration.text = medicine.expirationDate
 
-                detailStatus.text = if (medicine.isLowStock()) {
-                    "Low Stock"
-                } else {
-                    "Available"
-                }
+                detailStatus.text =
+                    if (medicine.isLowStock()) {
+                        "Low Stock"
+                    } else {
+                        "Available"
+                    }
             },
+
             onError = { error ->
-                Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    error,
+                    Toast.LENGTH_LONG
+                ).show()
             }
         )
     }

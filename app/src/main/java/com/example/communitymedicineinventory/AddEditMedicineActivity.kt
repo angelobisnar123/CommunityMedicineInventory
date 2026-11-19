@@ -1,3 +1,4 @@
+
 package com.example.communitymedicineinventory
 
 import android.os.Bundle
@@ -5,6 +6,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class AddEditMedicineActivity : AppCompatActivity() {
 
@@ -19,9 +22,25 @@ class AddEditMedicineActivity : AppCompatActivity() {
     private lateinit var cancelButton: Button
 
     private var medicineId: String = ""
+    private var userRole: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        userRole = intent.getStringExtra("USER_ROLE") ?: ""
+
+        if (userRole != "admin" &&
+            userRole != "inventory_custodian"
+        ) {
+            Toast.makeText(
+                this,
+                "You are not authorized to manage medicines.",
+                Toast.LENGTH_LONG
+            ).show()
+            finish()
+            return
+        }
+
         setContentView(R.layout.activity_add_edit_medicine)
 
         nameInput = findViewById(R.id.nameInput)
@@ -51,9 +70,11 @@ class AddEditMedicineActivity : AppCompatActivity() {
     }
 
     private fun loadMedicine() {
+
         MedicineRepository.getById(
             medicineId,
             onResult = { medicine ->
+
                 if (medicine != null) {
                     nameInput.setText(medicine.name)
                     categoryInput.setText(medicine.category)
@@ -71,12 +92,28 @@ class AddEditMedicineActivity : AppCompatActivity() {
                 }
             },
             onError = { error ->
-                Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    error,
+                    Toast.LENGTH_LONG
+                ).show()
             }
         )
     }
 
     private fun saveMedicine() {
+
+        if (userRole != "admin" &&
+            userRole != "inventory_custodian"
+        ) {
+            Toast.makeText(
+                this,
+                "You are not authorized to save medicines.",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+
         val name = nameInput.text.toString().trim()
         val category = categoryInput.text.toString().trim()
         val quantityText = quantityInput.text.toString().trim()
@@ -114,6 +151,30 @@ class AddEditMedicineActivity : AppCompatActivity() {
             return
         }
 
+        val dateFormat = SimpleDateFormat(
+            "yyyy-MM-dd",
+            Locale.US
+        ).apply {
+            isLenient = false
+        }
+
+        val validDate = try {
+            val parsedDate = dateFormat.parse(expiration)
+            parsedDate != null &&
+                    dateFormat.format(parsedDate) == expiration
+        } catch (e: Exception) {
+            false
+        }
+
+        if (!validDate) {
+            Toast.makeText(
+                this,
+                "Enter a valid expiration date (YYYY-MM-DD).",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+
         val medicine = Medicine(
             medicineId = medicineId,
             name = name,
@@ -143,7 +204,12 @@ class AddEditMedicineActivity : AppCompatActivity() {
             },
             onError = { error ->
                 saveMedicineButton.isEnabled = true
-                Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+
+                Toast.makeText(
+                    this,
+                    error,
+                    Toast.LENGTH_LONG
+                ).show()
             }
         )
     }

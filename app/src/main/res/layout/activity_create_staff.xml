@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F7F4"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="CREATE STAFF ACCOUNT"
+            android:textColor="#174D3A"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:text="Create an account and assign the appropriate staff role."
+            android:textColor="#779184"
+            android:textSize="14sp" />
+
+        <!-- Form Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:background="#FFFFFF"
+            android:elevation="3dp"
+            android:orientation="vertical"
+            android:padding="22dp">
+
+            <!-- Staff Name -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Staff Name"
+                android:textColor="#174D3A"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/staffNameInput"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#83B89B"
+                android:hint="Enter staff name"
+                android:inputType="textPersonName"
+                android:padding="14dp"
+                android:textColor="#174D3A"
+                android:textColorHint="#8A9D91" />
+
+            <!-- Email -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Email Address"
+                android:textColor="#174D3A"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/staffEmailInput"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#83B89B"
+                android:hint="Enter email address"
+                android:inputType="textEmailAddress"
+                android:padding="14dp"
+                android:textColor="#174D3A"
+                android:textColorHint="#8A9D91" />
+
+            <!-- Password -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Temporary Password"
+                android:textColor="#174D3A"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/staffPasswordInput"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#83B89B"
+                android:hint="Enter temporary password"
+                android:inputType="textPassword"
+                android:padding="14dp"
+                android:textColor="#174D3A"
+                android:textColorHint="#8A9D91" />
+
+            <!-- Role -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Assign Staff Role"
+                android:textColor="#174D3A"
+                android:textStyle="bold" />
+
+            <Spinner
+                android:id="@+id/roleSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginTop="8dp"
+                android:backgroundTint="#83B89B" />
+
+            <!-- Create -->
+            <Button
+                android:id="@+id/createStaffAccountButton"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_marginTop="25dp"
+                android:backgroundTint="#174D3A"
+                android:text="CREATE STAFF ACCOUNT"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+
+            <!-- Cancel -->
+            <Button
+                android:id="@+id/cancelCreateStaffButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="#E4EEE8"
+                android:text="CANCEL"
+                android:textColor="#174D3A"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
